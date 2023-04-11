@@ -9,8 +9,17 @@ if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 try {
     winget --version | Out-Null
 } catch {
-    Write-Host "winget is not installed. Please install Windows Package Manager before running this script." -ForegroundColor Red
-    Exit
+    Write-Host "winget is not installed." -ForegroundColor Red
+    $installWinget = Read-Host "Would you like to install Windows Package Manager? (Y/N)"
+    if ($installWinget -eq "Y" -or $installWinget -eq "y") {
+        Invoke-WebRequest -Uri "https://aka.ms/winget-cli.msixbundle" -OutFile "winget-cli.msixbundle"
+        Add-AppPackage -Path "winget-cli.msixbundle" | Out-Null
+        Remove-Item "winget-cli.msixbundle"
+        Write-Host "winget has been installed." -ForegroundColor Green
+    } else {
+        Write-Host "Please install Windows Package Manager before running this script." -ForegroundColor Red
+        Exit
+    }
 }
 
 # List of preset applications to install
@@ -22,11 +31,18 @@ $appsToInstall = @(
     "Valve.Steam"
 )
 
-# Install each application from the list
+# Get the list of installed packages
+$installedPackages = winget list --id --name
+
+# Install each application from the list if not already installed
 foreach ($app in $appsToInstall) {
-    Write-Host "Installing $app..." -ForegroundColor Yellow
-    winget install --id $app --accept-package-agreements --accept-source-agreements -e | Out-Null
-    Write-Host "$app has been installed." -ForegroundColor Green
+    if ($installedPackages -match $app) {
+        Write-Host "$app is already installed." -ForegroundColor Green
+    } else {
+        Write-Host "Installing $app..." -ForegroundColor Yellow
+        winget install --id $app --accept-package-agreements --accept-source-agreements -e | Out-Null
+        Write-Host "$app has been installed." -ForegroundColor Green
+    }
 }
 
-Write-Host "All preset applications have been installed." -ForegroundColor Green
+Write-Host "All preset applications have been processed." -ForegroundColor Green
