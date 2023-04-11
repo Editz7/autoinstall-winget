@@ -17,7 +17,7 @@ try {
 $appsToInstall = @(
     "7zip.7zip",
     "Discord.Discord",
-    "obsproject.obs-studio",
+    "OBSProject.OBSStudio",
     "Telegram.TelegramDesktop",
     "Valve.Steam"
 )
