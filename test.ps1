@@ -1,27 +1,25 @@
-# Check if Winget is installed
-if (!(Get-Command winget -ErrorAction SilentlyContinue)) {
-    # Prompt the user to install Winget
-    $installWinget = Read-Host "Winget is not installed. Do you want to install it? (Y/N)"
-    if ($installWinget -eq "Y") {
-        # Download and install the Winget MSI from Microsoft's GitHub repository
-        $wingetMsiUrl = "https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"
-        $wingetMsiPath = "$env:TEMP\winget.msixbundle"
-        Invoke-WebRequest $wingetMsiUrl -OutFile $wingetMsiPath
-        Add-AppPackage $wingetMsiPath -ErrorAction Stop
-        Write-Host "Winget installed successfully!"
+# Check if Chocolatey is installed
+if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
+    # Prompt the user to install Chocolatey
+    $installChoco = Read-Host "Chocolatey is not installed. Do you want to install it? (Y/N)"
+    if ($installChoco -eq "Y") {
+        # Download and install Chocolatey
+        Set-ExecutionPolicy Bypass -Scope Process -Force
+        Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+        Write-Host "Chocolatey installed successfully!"
     } else {
-        Write-Host "Winget installation cancelled."
+        Write-Host "Chocolatey installation cancelled."
         exit
     }
 }
 
 # Define a list of applications to install
-$applications = "7zip.7zip", "OBSProject.OBSStudio", "Discord.Discord", "Chromium.Chromium", "Telegram.TelegramDesktop"
+$applications = "7zip", "obs-studio", "discord", "chromium", "telegram"
 
-# Loop through the list of applications and install them using Winget
+# Loop through the list of applications and install them using Chocolatey
 foreach ($app in $applications) {
     Write-Host "Installing $app ..."
-    winget install $app -q
+    choco install $app -y
 }
 
 Write-Host "All applications installed successfully!"
