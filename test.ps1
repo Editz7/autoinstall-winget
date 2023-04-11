@@ -9,8 +9,18 @@ if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 try {
     winget --version | Out-Null
 } catch {
-    Write-Host "winget is not installed. Please install Windows Package Manager before running this script." -ForegroundColor Red
-    Exit
+    Write-Host "winget is not installed." -ForegroundColor Red
+    $installWinget = Read-Host "Would you like to install Windows Package Manager? (Y/N)"
+    if ($installWinget -eq "Y" -or $installWinget -eq "y") {
+        $wingetUrl = "https://github.com/microsoft/winget-cli/releases/download/v1.4.10173/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"
+        Invoke-WebRequest -Uri $wingetUrl -OutFile "Microsoft.DesktopAppInstaller.msixbundle"
+        Add-AppPackage -Path "Microsoft.DesktopAppInstaller.msixbundle" | Out-Null
+        Remove-Item "Microsoft.DesktopAppInstaller.msixbundle"
+        Write-Host "winget has been installed." -ForegroundColor Green
+    } else {
+        Write-Host "Please install Windows Package Manager before running this script." -ForegroundColor Red
+        Exit
+    }
 }
 
 # List of preset applications to install
